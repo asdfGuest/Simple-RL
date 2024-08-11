@@ -121,12 +121,12 @@ class PPOBuffer() :
     def __len__(self) :
         return len(self.buffer)
     
-    def __getitem__(self, index:Union[int,Tuple[int]]) -> PPOData:
-
+    def __getitem__(self, index:Union[int,Tuple[int],List[int]]) -> PPOData:
+        
         if isinstance(index, int) :
             return self.buffer[index]
         
-        elif isinstance(index, tuple) :
+        elif isinstance(index, tuple) or isinstance(index, list) :
             s, a, log_prob, g, adv = [], [], [], [], []
 
             for data in [self.buffer[idx] for idx in index] :
@@ -149,7 +149,7 @@ class PPOBuffer() :
         batched_data = []
         
         for start in range(0, self.__len__(), batch_size) :
-            batched_data.append(self[*indices[start:start+batch_size]])
+            batched_data.append(self[indices[start:start+batch_size]])
         
         return batched_data
 
