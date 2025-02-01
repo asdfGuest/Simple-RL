@@ -1,6 +1,6 @@
 from simple_rl.runner import PPORunner
 from simple_rl.algorithms.ppo import PPO, PPOCfg
-from simple_rl.modules.modules import MlpPolicy, MlpValue
+from simple_rl.modules.modules import MlpActorCritic
 from simple_rl.env.wrapper import GymEnvWrapper
 
 import torch as th
@@ -13,8 +13,7 @@ env = GymEnvWrapper(
     reward_scale=1/100
 )
 
-policy = MlpPolicy(env.n_obs, env.n_action, 0.8, [64,64], th.nn.SiLU)
-value = MlpValue(env.n_obs, [64,64], th.nn.SiLU)
+actor_critic = MlpActorCritic(env.n_obs, env.n_action, 0.8, [64,64], th.nn.SiLU)
 
 cfg = PPOCfg(
     n_rollout=8192,
@@ -27,12 +26,12 @@ cfg = PPOCfg(
     normalize_observation=True,
     ratio_clip_param=0.2,
     value_clip_param=None,
-    grad_norm_clip=None,
+    grad_norm_clip=1.0,
     normalize_advantage=True,
     entropy_loss_coeff=0.0,
     value_loss_coeff=1.0,
 )
-ppo = PPO(env.spec, policy, value, cfg)
+ppo = PPO(env.spec, actor_critic, cfg)
 
 runner = PPORunner(env, ppo)
 runner.train(250)

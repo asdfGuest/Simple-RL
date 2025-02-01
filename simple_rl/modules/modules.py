@@ -30,6 +30,17 @@ class BaseValue(th.nn.Module) :
         pass
 
 
+class BaseActorCritic(th.nn.Module) :
+    def __init__(self, policy:BasePolicy, value:BaseValue) :
+        super().__init__()
+        self.policy = policy
+        self.value = value
+    
+    @abstractmethod
+    def mean_std(self) -> float:
+        pass
+
+
 class MlpPolicy(BasePolicy) :
     def __init__(
             self,
@@ -71,3 +82,21 @@ class MlpValue(BaseValue) :
     
     def compute(self, obs:th.Tensor):
         return self.mlp(obs)
+
+
+class MlpActorCritic(BaseActorCritic) :
+    def __init__(
+            self,
+            n_obs:int,
+            n_action:int,
+            init_std:float,
+            net_arch:List[int],
+            activ_fn:Type[th.nn.Module],
+        ):
+        super().__init__(
+            policy=MlpPolicy(n_obs, n_action, init_std, net_arch, activ_fn),
+            value=MlpValue(n_obs, net_arch, activ_fn)
+        )
+    
+    def mean_std(self) :
+        return th.detach(self.policy.logstd).exp().mean().item()

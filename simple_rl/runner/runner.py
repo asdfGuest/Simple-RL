@@ -71,7 +71,7 @@ class PPORunner:
                     done=terminated|truncated
                 )
                 logger.push_tree({'Environment':env_info})
-                logger.push('Policy/std', self.algo.policy.logstd.detach().exp().mean())
+                logger.push('Policy/std', self.algo.actor_critic.mean_std())
             
             # ppo update
             algo_info = self.algo.update(i_iter / train_iters)
