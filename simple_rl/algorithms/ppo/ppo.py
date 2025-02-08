@@ -160,7 +160,7 @@ class PPO:
             self.optimizer.zero_grad()
             loss.backward()
             if self.cfg.grad_norm_clip is not None :
-                th.nn.utils.clip_grad_norm_(self.actor_critic.policy.parameters(), self.cfg.grad_norm_clip)
+                th.nn.utils.clip_grad_norm_(self.actor_critic.parameters(), self.cfg.grad_norm_clip)
             self.optimizer.step()
             # logging
             if self.cfg.desired_kl is not None :
